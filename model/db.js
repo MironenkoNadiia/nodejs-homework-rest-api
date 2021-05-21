@@ -1,9 +1,32 @@
-const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-const adapter = new FileSync("./model/contacts.json");
-const db = low(adapter);
+const uriDb = process.env.URI_DB;
 
-db.defaults({ contacts: [] }).write();
+const db = mongoose.connect(uriDb, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  poolSize: 5,
+});
+
+mongoose.connection.on("error", (err) => {
+  console.log(`mongoose error:${err.message}`);
+});
+
+mongoose.connection.on("disconnected", () => {
+  console.log('mongoose disconnected');
+});
+
+mongoose.connection.on("connected", () => {
+  console.log("Database connection successful");
+});
+
+process.on("SIGINT", async () => {
+  mongoose.connection.close(() => {
+    console.log("DB is disconnected");
+    process.exit(1);
+  });
+});
 
 module.exports = db;
