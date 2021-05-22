@@ -56,7 +56,7 @@ router.post(
   })
 );
 
-router.put("./:contactId",validObjectId, validUpdateContact, async (req, res, next) => {
+router.put("/:contactId",validObjectId, validUpdateContact, async (req, res, next) => {
   try {
     const contact = await Contacts.updateContact(
       req.params.contactId,
@@ -101,9 +101,12 @@ router.delete("/:contactId",validObjectId, async (req, res, next) => {
   }
 });
 
-router.patch("/:contactId/favorite",validUpdateContact, async (req, res, next) => {
+router.patch("/:contactId/favorite", async (req, res, next) => {
   try {
-    const contact = await Contacts.updateContact(req.params.contactId, req.body);
+    const contact = await Contacts.updateStatusContact(
+      req.params.contactId,
+      req.body
+    );
     if (contact) {
       return res.json({
         status: "success",
