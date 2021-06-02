@@ -1,15 +1,7 @@
-const express = require("express");
-// const { body } = require("express-validator");
-const router = express.Router();
-const Contacts = require("../../model/index");
-const handleError = require("../../helper/handle-error");
-const {
-  validCreateContact,
-  validUpdateContact,
-  validObjectId,
-} = require("./valid-contact-router");
+const Contacts = require("../model/contacts");
 
-router.get("/", async (req, res, next) => {
+
+const getAll = async (req, res, next) => {
   try {
     const contacts = await Contacts.listContacts();
     return res.json({
@@ -20,9 +12,9 @@ router.get("/", async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+};
 
-router.get("/:contactId", validObjectId, async (req, res, next) => {
+const getById = async (req, res, next) => {
   try {
     const contact = await Contacts.getContactById(req.params.contactId);
     if (contact) {
@@ -41,22 +33,18 @@ router.get("/:contactId", validObjectId, async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+};
 
-router.post(
-  "/",
-  validCreateContact,
-  handleError(async (req, res, next) => {
-    const contact = await Contacts.addContact(req.body);
-    return res.status(201).json({
-      status: "success",
-      code: 200,
-      data: { contact },
-    });
-  })
-);
+const create = async (req, res, next) => {
+  const contact = await Contacts.addContact(req.body);
+  return res.status(201).json({
+    status: "success",
+    code: 200,
+    data: { contact },
+  });
+};
 
-router.put("/:contactId",validObjectId, validUpdateContact, async (req, res, next) => {
+const update = async (req, res, next) => {
   try {
     const contact = await Contacts.updateContact(
       req.params.contactId,
@@ -78,9 +66,9 @@ router.put("/:contactId",validObjectId, validUpdateContact, async (req, res, nex
   } catch (e) {
     next(e);
   }
-});
+};
 
-router.delete("/:contactId",validObjectId, async (req, res, next) => {
+const remove=async (req, res, next) => {
   try {
     const contact = await Contacts.removeContact(req.params.contactId);
     if (contact) {
@@ -99,9 +87,9 @@ router.delete("/:contactId",validObjectId, async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+}
 
-router.patch("/:contactId/favorite", async (req, res, next) => {
+const updateStatus=async (req, res, next) => {
   try {
     const contact = await Contacts.updateStatusContact(
       req.params.contactId,
@@ -123,6 +111,13 @@ router.patch("/:contactId/favorite", async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+    getAll,
+    getById,
+    create,
+    update,
+    remove,
+    updateStatus
+}
